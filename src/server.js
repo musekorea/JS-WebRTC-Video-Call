@@ -8,6 +8,7 @@ const httpServer = http.createServer(app);
 const sokcetServer = new Server(httpServer);
 
 app.use('/public', express.static(process.cwd() + '/public'));
+app.use('/assets', express.static(process.cwd() + '/assets'));
 app.set('view engine', 'ejs');
 app.set('views', process.cwd() + '/public/views');
 
