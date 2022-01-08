@@ -11,8 +11,22 @@
 </head>
 <body>
   <h3>WebRTC Video Call</h3>
+  <div id="roomWrapper">
+    <form action="" id="roomForm">
+      <label for="roomInput">Please join a room</label><br>
+      <input type="text" id="roomInput" placeholder="Room Name" required>
+      <button>Enter Room</button>
+    </form>
+  </div>
+  
   <div id="videoWrapper">
     <video id="myVideo" autoplay playsinline width="400" height="400"></video>
+    <div>
+      <button id="audioBtn">Audio Off</button >
+      <button id="videoBtn">Video Off</button>
+      <select name="" id="cameraSelect">
+      </select>
+    </div>
   </div>
 </body>
 </html>

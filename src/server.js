@@ -19,6 +19,17 @@ app.get('/*', (req, res) => {
   return res.redirect('/');
 });
 
+sokcetServer.on('connect', (socket) => {
+  socket.onAny((event) => {
+    console.log(event);
+  });
+  socket.on('joinRoom', (roomName, cameraStart) => {
+    socket.join(roomName);
+    cameraStart();
+    socket.to(roomName).emit('welcomeRoom');
+  });
+});
+
 httpServer.listen(8080, () => {
   console.log(`Server is listening on Port 8080`);
 });
