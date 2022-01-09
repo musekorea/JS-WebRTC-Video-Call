@@ -23,10 +23,17 @@ sokcetServer.on('connect', (socket) => {
   socket.onAny((event) => {
     console.log(event);
   });
-  socket.on('joinRoom', (roomName, cameraStart) => {
+  socket.on('joinRoom', async (roomName) => {
     socket.join(roomName);
-    cameraStart();
     socket.to(roomName).emit('welcomeRoom');
+  });
+  socket.on('offer', (offer, roomName) => {
+    console.log(`offer comes`, offer);
+    socket.to(roomName).emit('offer', offer);
+  });
+  socket.on('answer', (answer, roomname) => {
+    console.log('answer comes', answer);
+    socket.to(roomname).emit('answer', answer);
   });
 });
 

@@ -15,6 +15,7 @@ let myStream;
 let audioOff = false;
 let videoOff = false;
 let currentRoom = '';
+let peerConnection;
 
 const getDevices = async () => {
   try {
@@ -89,21 +90,47 @@ cameraSelect.addEventListener('change', (e) => {
   videoBtn.innerHTML = 'Video Off';
 });
 
+const RTCSignaling = () => {
+  peerConnection = new RTCPeerConnection();
+  myStream.getTracks().forEach((track) => {
+    peerConnection.addTrack(track, myStream);
+  });
+};
+
 const cameraStart = async () => {
   roomWrapper.hidden = true;
   await getDevices();
   await getMedia();
   videoWrapper.hidden = false;
+  RTCSignaling();
 };
 
-socket.on('welcomeRoom', () => {
-  console.log('someone joined');
+socket.on('offer', async (offer) => {
+  console.log(`offer comes`, offer);
+  peerConnection.setRemoteDescription(offer);
+  const answer = await peerConnection.createAnswer();
+  peerConnection.setLocalDescription(answer);
+  socket.emit('answer', answer, currentRoom);
+  console.log('sent answer');
 });
 
-roomForm.addEventListener('submit', (e) => {
+socket.on('answer', (answer) => {
+  console.log('answer comes', answer);
+  peerConnection.setRemoteDescription(answer);
+});
+
+socket.on('welcomeRoom', async () => {
+  console.log('someone joined');
+  const offer = await peerConnection.createOffer();
+  peerConnection.setLocalDescription(offer);
+  socket.emit('offer', offer, currentRoom);
+});
+
+roomForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
-    socket.emit('joinRoom', roomInput.value, cameraStart);
+    await cameraStart();
+    socket.emit('joinRoom', roomInput.value);
     currentRoom = roomInput.value;
   } catch (error) {
     console.log(error);
@@ -113,4 +140,5 @@ roomForm.addEventListener('submit', (e) => {
 const init = () => {
   videoWrapper.hidden = true;
 };
+
 init();
