@@ -90,8 +90,15 @@ cameraSelect.addEventListener('change', (e) => {
   videoBtn.innerHTML = 'Video Off';
 });
 
+const handleICECandidate = (data) => {
+  console.log('get ICE Candidate');
+  console.log(data);
+  socket.emit('ice', data.candidate, currentRoom);
+};
+
 const RTCSignaling = () => {
   peerConnection = new RTCPeerConnection();
+  peerConnection.addEventListener('icecandidate', handleICECandidate);
   myStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, myStream);
   });
@@ -124,6 +131,11 @@ socket.on('welcomeRoom', async () => {
   const offer = await peerConnection.createOffer();
   peerConnection.setLocalDescription(offer);
   socket.emit('offer', offer, currentRoom);
+});
+
+socket.on('ice', (ice) => {
+  console.log('received candidate from server');
+  peerConnection.addIceCandidate(ice);
 });
 
 roomForm.addEventListener('submit', async (e) => {

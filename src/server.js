@@ -35,6 +35,10 @@ sokcetServer.on('connect', (socket) => {
     console.log('answer comes', answer);
     socket.to(roomname).emit('answer', answer);
   });
+  socket.on('ice', (ice, roomname) => {
+    console.log('Sent ICE Candidate');
+    socket.to(roomname).emit('ice', ice);
+  });
 });
 
 httpServer.listen(8080, () => {
